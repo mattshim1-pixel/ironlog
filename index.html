@@ -316,11 +316,12 @@ function viewTrain(){
 function exCard(ex,ei){
   const best=bestE1RM(ex.name);
   const last=lastSets(ex.name);
+  const meta=[ex.repRange?`Target ${esc(ex.repRange)} reps`:``, best?`Best e1RM ${fmtNum(best)}${unit()}`:``].filter(Boolean).join(" · ");
   let html=`<div class="ex-card"><div class="ex-head">
     <div><div class="ex-name">${esc(ex.name)}</div>
-    ${best?`<div class="ex-meta">Best e1RM ${fmtNum(best)}${unit()}</div>`:``}</div>
+    ${meta?`<div class="ex-meta">${meta}</div>`:``}</div>
     <button class="ex-x" onclick="removeExercise(${ei})">✕</button></div>`;
-  html+=`<div class="set"><div></div><div class="set-lab"><span>Weight (${unit()})</span><span>Reps</span></div><div></div></div>`;
+  html+=`<div class="set"><div></div><div class="set-lab"><span>Weight (${unit()})</span><span>Reps${ex.repRange?` · ${esc(ex.repRange)}`:``}</span></div><div></div></div>`;
   ex.sets.forEach((st,si)=>{
     const done=st.done!==false;
     const isPR = st.weight&&st.reps && e1rm(st.weight,st.reps) > best-0.01 && e1rm(st.weight,st.reps)>0 && bestE1RM(ex.name)<=e1rm(st.weight,st.reps);
@@ -350,7 +351,7 @@ function exCard(ex,ei){
 function startDay(pid,did){
   const p=S.programs.find(x=>x.id===pid); const day=p.days.find(x=>x.id===did);
   S.draft={ id:uid(), date:todayISO(), programId:pid, dayId:did, dayName:day.name,
-    exercises: day.exercises.map(ex=>({ name:ex.name,
+    exercises: day.exercises.map(ex=>({ name:ex.name, repRange:ex.repRange||"",
       sets: Array.from({length:ex.sets||3},()=>({weight:"",reps:"",done:false})) })) };
   save(); render();
 }
